@@ -25,27 +25,29 @@ namespace FunctionApp2
 
             string htmlCode = req.Query["Code"];
 
-            string request = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(request);
-            htmlCode = htmlCode ?? data?.Code;
-
-            var parser = new HtmlParser();
-
-            var source = htmlCode;
-            var document = parser.Parse(source);
-            var docuLinq = document.All.Where(m => m.LocalName == "img");
-            var count = docuLinq.Count();
-
-            string words = rx.Replace(htmlCode, "");
-            MatchCollection collection = Regex.Matches(words, @"[\S]+");
-
-            var gcd = GreatestCommonDenominator(collection.Count, count);
-
-            if(htmlCode != null)
+            if (htmlCode != null)
             {
+
+                string request = await new StreamReader(req.Body).ReadToEndAsync();
+                dynamic data = JsonConvert.DeserializeObject(request);
+                htmlCode = htmlCode ?? data?.Code;
+
+                var parser = new HtmlParser();
+
+                var source = htmlCode;
+                var document = parser.Parse(source);
+                var docuLinq = document.All.Where(m => m.LocalName == "img");
+                var count = docuLinq.Count();
+
+                string words = rx.Replace(htmlCode, "");
+                MatchCollection collection = Regex.Matches(words, @"[\S]+");
+
+                var gcd = GreatestCommonDenominator(collection.Count, count);
+
+
                 ActionResult glenn = (ActionResult)new OkObjectResult($"Total number of images in the page: {count}\n" +
                     $"Total number of words: {collection.Count}\n" +
-                    $"Image to text Ratio: {count/gcd}:{collection.Count/gcd}");
+                    $"Image to text Ratio: {count / gcd}:{collection.Count / gcd}");
                 return glenn;
             }
             else
@@ -56,7 +58,7 @@ namespace FunctionApp2
 
         static int GreatestCommonDenominator(int x, int y)
         {
-            if(y == 0)
+            if (y == 0)
             {
                 return Math.Abs(x);
             }
